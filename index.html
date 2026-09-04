@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Bubble Blast - Parceria de Influenciadores</title>
+  
+  <!-- Favicon / Ícone da Aba -->
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="shortcut icon" type="image/png" href="assets/logo.png" />
+  <link rel="apple-touch-icon" href="assets/logo.png" />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&family=Poppins:wght@600;800;900&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background-color: #0c021a;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    /* Main Container / Single Section (Mobile Optimized dvh) */
+    .presell-wrapper {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100dvh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem 1rem;
+      background: radial-gradient(circle at 50% 25%, #320968 0%, #150330 55%, #070112 100%);
+      z-index: 1;
+    }
+
+    /* Ambient Glow Effects */
+    .ambient-glow {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.5) 0%, rgba(59, 130, 246, 0.25) 50%, transparent 70%);
+      filter: blur(50px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .ambient-glow-bottom {
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 380px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(234, 179, 8, 0.3) 0%, transparent 70%);
+      filter: blur(60px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Floating Canvas Bubbles */
+    #bubbleCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Content Box */
+    .content-box {
+      position: relative;
+      z-index: 2;
+      max-width: 600px;
+      width: 100%;
+      margin: auto 0;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* TOP LOGO (Positioned at the top) */
+    .top-logo-container {
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .top-logo-img {
+      width: min(180px, 48vw);
+      height: auto;
+      filter: drop-shadow(0 8px 22px rgba(168, 85, 247, 0.65));
+      transition: transform 0.3s ease;
+    }
+
+    .top-logo-img:hover {
+      transform: scale(1.04);
+    }
+
+    /* Top Badge */
+    .attention-badge {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
+      font-size: clamp(0.75rem, 3.4vw, 1.05rem);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      padding: 0.45rem 1.1rem;
+      border-radius: 50px;
+      box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4), inset 0 0 12px rgba(255, 255, 255, 0.15);
+      animation: pulse-border 2s infinite alternate;
+      max-width: 100%;
+      white-space: nowrap;
+    }
+
+    @keyframes pulse-border {
+      0% {
+        border-color: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4);
+      }
+      100% {
+        border-color: rgba(234, 179, 8, 0.7);
+        box-shadow: 0 4px 25px rgba(234, 179, 8, 0.6);
+      }
+    }
+
+    .sub-headline {
+      font-size: clamp(0.68rem, 2.8vw, 0.82rem);
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.8);
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* 3D Title Styles (Reference Image Style) */
+    .title-container {
+      margin: 0.2rem 0;
+      line-height: 0.95;
+    }
+
+    .text-ganhe {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.8rem, 12vw, 4.8rem);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      background: linear-gradient(180deg, #60a5fa 0%, #2563eb 50%, #1d4ed8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0px 3px 0px #0f172a) drop-shadow(0px 5px 15px rgba(37, 99, 235, 0.85));
+      position: relative;
+      display: block;
+      transform: perspective(500px) rotateX(4deg);
+    }
+
+    .text-70 {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 900;
+      font-size: clamp(4.2rem, 19vw, 7.8rem);
+      text-transform: uppercase;
+      letter-spacing: -2px;
+      background: linear-gradient(180deg, #fef08a 0%, #facc15 40%, #eab308 70%, #ca8a04 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0px 5px 0px #78350f) drop-shadow(0px 8px 25px rgba(234, 179, 8, 0.95));
+      display: block;
+      margin-top: -0.7rem;
+      transform: perspective(500px) rotateX(4deg);
+    }
+
+    /* Feature Pills Badge */
+    .pills-container {
+      margin: 0.9rem 0;
+      background: rgba(15, 7, 32, 0.8);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      border-radius: 50px;
+      padding: 0.6rem 1rem;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(168, 85, 247, 0.25);
+      max-width: 98%;
+    }
+
+    .pills-text {
+      font-size: clamp(0.6rem, 2.5vw, 0.72rem);
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #e9d5ff;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem 0.6rem;
+    }
+
+    .pill-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    .pill-dot {
+      color: #facc15;
+      font-size: 0.55rem;
+    }
+
+    /* FOCUS CTA BUTTON (Conversion Magnet) */
+    .cta-wrapper {
+      width: 100%;
+      max-width: 440px;
+      margin-top: 0.75rem;
+      position: relative;
+    }
+
+    .cta-button {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      width: 100%;
+      padding: 1.1rem 1.25rem;
+      min-height: 56px;
+      background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+      color: #ffffff;
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(0.95rem, 4.2vw, 1.2rem);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: 60px;
+      text-decoration: none;
+      box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7),
+                  0 10px 30px rgba(37, 211, 102, 0.55),
+                  inset 0 2px 4px rgba(255, 255, 255, 0.45);
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      animation: pulse-cta 1.8s infinite;
+      overflow: hidden;
+    }
+
+    /* Shimmer effect inside button */
+    .cta-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 50%;
+      height: 200%;
+      background: linear-gradient(
+        60deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.45) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(25deg);
+      animation: shimmer 2.8s infinite;
+    }
+
+    @keyframes shimmer {
+      0% { left: -60%; }
+      35% { left: 130%; }
+      100% { left: 130%; }
+    }
+
+    @keyframes pulse-cta {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7), 0 10px 25px rgba(37, 211, 102, 0.4);
+      }
+      50% {
+        transform: scale(1.03);
+        box-shadow: 0 0 0 16px rgba(37, 211, 102, 0), 0 14px 35px rgba(37, 211, 102, 0.75);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0), 0 10px 25px rgba(37, 211, 102, 0.4);
+      }
+    }
+
+    .cta-button:active {
+      transform: translateY(2px) scale(0.98);
+      background: linear-gradient(135deg, #22c55e 0%, #0f766e 100%);
+    }
+
+    .cta-icon {
+      font-size: 1.6rem;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    /* Sub-text under button */
+    .online-indicator {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-top: 0.65rem;
+      font-size: clamp(0.68rem, 2.6vw, 0.78rem);
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 600;
+    }
+
+    .online-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #22c55e;
+      animation: blink 1.5s infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Mobile Screen Height Adjustments */
+    @media (max-height: 670px) {
+      .presell-wrapper {
+        padding: 0.75rem 0.5rem;
+      }
+      .top-logo-img {
+        width: 125px;
+      }
+      .attention-badge {
+        padding: 0.35rem 0.8rem;
+      }
+      .sub-headline {
+        margin-top: 0.3rem;
+        margin-bottom: 0.3rem;
+      }
+      .title-container {
+        margin: 0;
+      }
+      .text-70 {
+        margin-top: -0.5rem;
+      }
+      .pills-container {
+        margin: 0.5rem 0;
+        padding: 0.45rem 0.75rem;
+      }
+      .cta-wrapper {
+        margin-top: 0.5rem;
+      }
+      .cta-button {
+        padding: 0.85rem 1rem;
+        min-height: 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="presell-wrapper">
+    <!-- Canvas for floating game bubbles -->
+    <canvas id="bubbleCanvas"></canvas>
+
+    <!-- Background Ambient Glows -->
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow-bottom"></div>
+
+    <!-- Main Content Container -->
+    <main class="content-box">
+      
+      <!-- 1. TOP LOGO SECTION (Posicionada na parte de cima) -->
+      <header class="top-logo-container">
+        <img src="assets/logo.png" alt="Bubble Blast Logo" class="top-logo-img" />
+      </header>
+
+      <!-- 2. Top Attention Badge -->
+      <div class="attention-badge">
+        <i class="fa-solid fa-fire text-amber-400 mr-1"></i> INFLUENCIADORES E GERENTES, ATENÇÃO!
+      </div>
+
+      <div class="sub-headline">
+        O NOVO FENÔMENO DO MERCADO
+      </div>
+
+      <!-- 3. Main Headline: GANHE 70% (3D Styled) -->
+      <div class="title-container">
+        <span class="text-ganhe">GANHE</span>
+        <span class="text-70">70%</span>
+      </div>
+
+      <!-- 4. Features Pills Bar -->
+      <div class="pills-container">
+        <div class="pills-text">
+          <span class="pill-item"><i class="fa-solid fa-shield-halved text-purple-400"></i> OPERAÇÃO SEGURA</span>
+          <span class="pill-dot">•</span>
+          <span class="pill-item"><i class="fa-solid fa-chart-line text-blue-400"></i> ALTA CONVERSÃO</span>
+          <span class="pill-dot">•</span>
+          <span class="pill-item"><i class="fa-solid fa-bolt text-yellow-400"></i> PAGAMENTO NA HORA</span>
+          <span class="pill-dot">•</span>
+          <span class="pill-item"><i class="fa-solid fa-headset text-green-400"></i> SUPORTE 24/7</span>
+        </div>
+      </div>
+
+      <!-- 5. Conversion Focus CTA Button -->
+      <div class="cta-wrapper">
+        <a href="https://wa.me/557193922106?text=Ol%C3%A1!%20Sou%20influenciador%20e%20tenho%20interesse%20em%20fazer%20parceria%20com%20o%20Bubble%20Blast." target="_blank" class="cta-button">
+          <i class="fa-brands fa-whatsapp cta-icon"></i>
+          <span>QUERO SER UM AFILIADO</span>
+        </a>
+
+        <div class="online-indicator">
+          <span class="online-dot"></span>
+          <span>Gerente Oficial Online • Clique acima para iniciar</span>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Interactive Floating Bubbles Script -->
+  <script>
+    const canvas = document.getElementById('bubbleCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const colors = [
+      { fill: 'rgba(239, 68, 68, 0.45)', stroke: 'rgba(252, 165, 165, 0.7)' },   // Red bubble
+      { fill: 'rgba(234, 179, 8, 0.45)', stroke: 'rgba(254, 240, 138, 0.7)' },   // Yellow bubble
+      { fill: 'rgba(59, 130, 246, 0.45)', stroke: 'rgba(147, 197, 253, 0.7)' },  // Blue bubble
+      { fill: 'rgba(168, 85, 247, 0.45)', stroke: 'rgba(216, 180, 254, 0.7)' },  // Purple bubble
+      { fill: 'rgba(34, 197, 94, 0.45)', stroke: 'rgba(134, 239, 172, 0.7)' }    // Green bubble
+    ];
+
+    class Bubble {
+      constructor() {
+        this.reset();
+      }
+
+      reset() {
+        this.radius = Math.random() * 24 + 10;
+        this.x = Math.random() * (width - this.radius * 2) + this.radius;
+        this.y = height + this.radius + Math.random() * 80;
+        this.speedY = Math.random() * 0.7 + 0.3;
+        this.speedX = Math.sin(Math.random() * Math.PI) * 0.4;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.alpha = Math.random() * 0.6 + 0.4;
+        this.pulse = Math.random() * Math.PI;
+      }
+
+      update() {
+        this.y -= this.speedY;
+        this.pulse += 0.02;
+        this.x += Math.sin(this.pulse) * 0.4;
+
+        if (this.y < -this.radius * 2) {
+          this.reset();
+        }
+      }
+
+      draw() {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        
+        // Gradient fill for glass orb effect
+        const grad = ctx.createRadialGradient(
+          this.x - this.radius * 0.3,
+          this.y - this.radius * 0.3,
+          this.radius * 0.1,
+          this.x,
+          this.y,
+          this.radius
+        );
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.7)');
+        grad.addColorStop(0.4, this.color.fill);
+        grad.addColorStop(1, 'rgba(10, 2, 25, 0.8)');
+
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.lineWidth = 1.8;
+        ctx.strokeStyle = this.color.stroke;
+        ctx.stroke();
+
+        // Highlight shine arc
+        ctx.beginPath();
+        ctx.arc(this.x - this.radius * 0.3, this.y - this.radius * 0.3, this.radius * 0.35, Math.PI * 1.2, Math.PI * 1.8);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.restore();
+      }
+    }
+
+    const bubbleCount = window.innerWidth < 600 ? 15 : 22;
+    const bubbles = Array.from({ length: bubbleCount }, () => new Bubble());
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      bubbles.forEach(b => {
+        b.update();
+        b.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
